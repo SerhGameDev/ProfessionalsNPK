@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Core.Infrastructure
 {
-    public class Singlton<T> : MonoBehaviour where T : MonoBehaviour
+    public class MonoBehaviourSinglton<T> : MonoBehaviour where T : MonoBehaviour
     {
         public static T Instance { get; private set; }
 

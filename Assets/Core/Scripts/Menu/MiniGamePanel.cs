@@ -1,19 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Data;
+using Core.Infrastructure;
+using UnityEngine.SceneManagement;
 
 namespace Core.Menu
 {
-    public sealed class MiniGamePanel : MonoBehaviour
+    public sealed class MiniGamePanel : Panel
     {
-        [SerializeField] private GameObject _panel;
-
-        public void Show()
-        {
-            _panel.SetActive(true);
-        }
-
-        public void Hide()
-        {
-            _panel.SetActive(false);
-        }
+        public void OpenGame(int id) => SceneManager.LoadScene(id);
     }
+
 }
