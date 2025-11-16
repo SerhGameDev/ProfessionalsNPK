@@ -8,9 +8,17 @@ namespace Core.Game.Quiz
         [SerializeField] private Button _button;
         [SerializeField] private TextMeshProUGUI _textMesh;
 
-        public void SetText(string text)
+        private FieldText _fieldText;
+
+
+        public void Init(string letter, FieldText fieldText)
         {
-            _textMesh.text = text;
+            _fieldText = fieldText;
+            _textMesh.text = letter;
+            _button.onClick.AddListener(Click);
         }
+
+        public void Click() => _fieldText.AddLetter(_textMesh.text);
+
     }
 }
