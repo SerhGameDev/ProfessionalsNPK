@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,7 +10,8 @@ namespace Core.Game.Quiz
     [RequireComponent(typeof(FieldText))]
     public sealed class Quiz : MonoBehaviour
     {
-        [SerializeField] private string _text = "Привет";
+        [SerializeField] private List<QuizItem> _texts;
+        
         [SerializeField] private Transform _rootLetters;
         [Header("Prefab")]
         [SerializeField] private ButtonLetter _prefabButtonLetter;
@@ -19,6 +21,8 @@ namespace Core.Game.Quiz
 
         private FieldText _fieldText;
         private List<ButtonLetter> _letters = new();
+        private OpenQuiz open = 0;
+        private int _level;
 
         private void Awake()
         {
@@ -31,13 +35,25 @@ namespace Core.Game.Quiz
                 _buttonClear.onClick.AddListener(Clear);
         }
 
-        private void Start() => ShowQuiz();
-
-        public void ShowQuiz() => ShowButtonLetters(_text);
-
-        public void ShowButtonLetters(string text)
+        private void Start()
         {
-            string randomLetters = ShuffleLettersInWords(text);
+            ShowQuiz();
+        }
+
+        public void ShowQuiz() => ShowButtonLetters();
+
+        public void ShowButtonLetters()
+        {
+            string randomLetters = "";
+
+            if (OpenQuiz.BuildingName == open)
+                randomLetters = ShuffleLettersInWords(_texts[_level].BuildingName);
+
+            if (OpenQuiz.City == open)
+                randomLetters = ShuffleLettersInWords(_texts[_level].City);
+
+            if (OpenQuiz.Сountry == open)
+                randomLetters = ShuffleLettersInWords(_texts[_level].Сountry);
 
             _letters.Clear();
             _rootLetters.Cast<Transform>().ToList().ForEach(child => Destroy(child));
@@ -52,18 +68,30 @@ namespace Core.Game.Quiz
 
         public void Send()
         {
-            if(_fieldText.TextMesh.text == _text)
+            string buildingNameText = _texts[_level].City;
+            if (OpenQuiz.BuildingName == open && _fieldText.TextMesh.text == _texts[_level].BuildingName)
             {
-                OpenMene(1);
+                open = OpenQuiz.City;
+                _fieldText.TextMesh.text = buildingNameText;
+                return;
             }
-            else
+
+            string cityText = buildingNameText + _texts[_level].City;
+            if (OpenQuiz.City == open && _fieldText.TextMesh.text == cityText)
             {
-                Clear();
+                open = OpenQuiz.BuildingName;
+                _fieldText.TextMesh.text = cityText;
+                return;
             }
-            
+
         }
 
-        public void Clear() => _fieldText.ClearText();
+        public void Clear()
+        {
+            _fieldText.ClearText();
+            _letters.ForEach(letter => letter.SetActiveState());
+
+        }
 
         public void OpenMene(int id) => SceneManager.LoadScene(id);
 
@@ -91,6 +119,20 @@ namespace Core.Game.Quiz
             }
 
             return string.Join(" ", words);
+        }
+
+        [Serializable]
+        private class QuizItem
+        {
+            public string BuildingName;
+            public string City;
+            public string Сountry;
+        }
+        public enum OpenQuiz
+        {
+            BuildingName = 0,
+            City = 1,
+            Сountry = 2
         }
     }
 }
